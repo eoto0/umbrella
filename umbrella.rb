@@ -34,7 +34,7 @@ pp first_results.keys
 
 geometry = first_results.fetch("geometry") 
 
-pp geometry.keys
+#pp geometry.keys
 
 location = geometry.fetch("location")
 
@@ -61,10 +61,54 @@ temperature = parsed_response.fetch("currently").fetch("temperature")
 
 summary = parsed_response.fetch("currently").fetch("summary")
 
-pp temperature
+#pp temperature
 
-pp summary
+#pp summary
+
+data = parsed_response.fetch("hourly").fetch("data")
+
+
+require "time"
+
+#time = Time.at(data[0]["time"])
+
+#pp time
+
+first_time = Time.at(data.first["time"])
+
+pp first_time
+
+next_12_hours = data.first(12)
+
+
+rainy_hours = next_12_hours.select {|hour| hour["precipProbability"] > 0.1 }
+
+if rainy_hours.any?
+  pp "You might want to carry an umbrella"
+
+rainy_hours.each do |hour|
+  time = Time.at(hour["time"])
+  hours_later = (time - first_time)/3600.round
+  chance = (hour["precipProbability"]*100).round
+  pp hours_later
+  pp "#{chance}% chance of rain #{hours_later} hours later than the forecasted hour"
+end
+
+else 
+  pp "You probably won't need an umbrella today"
+end
 
 
 
+# data.first(12).each do |hour|
+#   pp time = Time.at(hour["time"])
+#   pp time
+#   if hour["precipProbability"] > 0.1 
+#     pp "You might want to carry an umbrella"
+#     hours_later = (time - first_time) 
+#     pp "This is {#hours_later} hours later than the forecasted hour"
+#   else 
+#     pp "You probably won't need an umbrella today"
+#   end
+# end
 #pp parsed_response
